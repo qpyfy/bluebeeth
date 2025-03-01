@@ -52,13 +52,13 @@ void Usart3_SendString(char* str){
     }
 }
 
-
-
+u8 rxdata;
+u8 rxflag = 0;
 void USART3_IRQHandler(void){
     if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET){
-        uint8_t byte = USART_ReceiveData(USART3);
+        rxdata = USART_ReceiveData(USART3);
         //TODO 处理接收到的数据
-
+        rxflag = 1;
 
         USART_ClearITPendingBit(USART3, USART_IT_RXNE);
     }

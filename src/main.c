@@ -3,6 +3,9 @@
 #include "usart3.h"
 #include "oled.h"
 
+extern u8 rxdata;
+extern u8 rxflag;
+
 void delay(int x)
 {
     for (int i = 0; i < x; i++)
@@ -21,8 +24,12 @@ int main()
     OLED_Clear();
     while (1)
     {
+       if(rxflag)
+       {
         OLED_ShowString(0, 0, "RX:");
-        
+        OLED_ShowHexNum(0, 2, rxdata);
+        rxflag = 0;
+       }
     }
     
 }
