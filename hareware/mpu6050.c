@@ -49,11 +49,45 @@ void MPU6050_LinkTest(void){
     }
 }
 
+void MPU6050_WriteReg(uint8_t reg, uint8_t data){
+    I2C_WriteReg(MPU6050_SLAVE_ADDRESS, reg, data);
+}
+/*
+@note 复位MPU6050
+*/
+void MPU6050_Reset(void){
+    MPU6050_WriteReg(MPU6050_PWR_MGMT_1, 0x80);
+}
+/*
+@note 唤醒MPU6050
+*/
+void MPU6050_WakeUp(void){
+    MPU6050_WriteReg(MPU6050_PWR_MGMT_1, 0x00);
+}
+/*
+@param config 分辨率 0~3
+@note 0: ±250°/s   1: ±500°/s
+@note 2: ±1000°/s  3: ±2000°/s
+*/
+void MPU6050_SetGyroConfig(uint8_t config){
+    config = config > 3 ? 3 : (config < 0 ? 0 : config); //限制config范围0-3
+    MPU6050_WriteReg(MPU6050_GYRO_CONFIG, config);
+}
+
+void MPU6050_SetAccelConfig(uint8_t config){
+    config = config > 3 ? 3 : (config < 0 ? 0 : config); //限制config范围0-3
+    MPU6050_WriteReg(MPU6050_ACCEL_CONFIG, config);
+}
+
+void MPU6050_ReadReg(uint8_t reg, uint8_t* buff, uint8_t len){
+    I2C_ReadReg(MPU6050_SLAVE_ADDRESS, reg, buff, len);
+}
+
 
 
 void EXTI9_5_IRQHandler(void){
     if(EXTI_GetITStatus(EXTI_Line5) != RESET){
         EXTI_ClearITPendingBit(EXTI_Line5);
-        //TODO 处理中断
+        //TODO 处理陀螺仪数据
     }
 }

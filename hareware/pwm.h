@@ -6,5 +6,7 @@
 
 void PWM_Init(void);
 
-void PWM_SetDutyCycle(uint16_t dutyCycle);
+void PWMA_SetDutyCycle(uint8_t dutyCycle);
+
+void PWMB_SetDutyCycle(uint8_t dutyCycle);
 #endif // !PWM_H

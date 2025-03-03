@@ -52,6 +52,10 @@ void Usart3_SendString(char* str){
     }
 }
 
+uint8_t Usart3_ReceiveByte(void){
+     return rxdata[0];
+}
+
 #define BUFF_SIZE 128
 
 u8 rxdata[BUFF_SIZE];
