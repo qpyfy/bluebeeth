@@ -51,12 +51,6 @@ void Usart3_SendString(char* str){
         Usart3_SendByte(*str++);
     }
 }
-/*
-@return 上次接收到的数据
-*/
-uint8_t Usart3_ReceiveByte(void){
-    return rxdata;
-}
 
 #define BUFF_SIZE 128
 
@@ -67,7 +61,7 @@ u8 rxlen = 0;
 
 
 void ClearBuff(void){
-    for (size_t i = 0; i < rxlen; i++)
+    for (uint8_t i = 0; i < rxlen; i++)
     {
         rxbuff[i] = 0;
     }
@@ -84,7 +78,11 @@ void USART3_IRQHandler(void){
             rxbuff[rxlen++] = data;
         }
         else {
-            rxdata = rxbuff;
+            for (uint8_t i = 0; i < rxlen; i++)
+            {
+                rxdata[i] = rxbuff[i];
+            }
+            rxlen = 0;
             ClearBuff();
         }
         

@@ -7,16 +7,11 @@ pin_8 控制电机B 速度
 
 void PWM_Init(void){
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM1, ENABLE);
 
     GPIO_InitTypeDef GPIO_InitStructure;
     GPIO_StructInit(&GPIO_InitStructure);
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
-
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11 | GPIO_Pin_8;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOA, &GPIO_InitStructure);
@@ -46,8 +41,18 @@ void PWM_Init(void){
     TIM_Cmd(TIM1, ENABLE);
 }
 
-
-void PWM_SetDutyCycle(uint16_t dutyCycle){
-    TIM_SetCompare1(TIM1, dutyCycle);
+/*
+@param dutyCycle 占空比 0~100
+*/
+void PWM_SetOC1DutyCycle(uint8_t dutyCycle){
+    uint8_t tim_pulse = 1000 * dutyCycle / 100;
+    TIM_SetCompare1(TIM1, tim_pulse);
+}
+/*
+@param dutyCycle 占空比 0~100
+*/
+void PWM_SetOC4DutyCycle(uint8_t dutyCycle){
+    uint8_t tim_pulse = 1000 * dutyCycle / 100;
+    TIM_SetCompare4(TIM1, tim_pulse);
 }
 

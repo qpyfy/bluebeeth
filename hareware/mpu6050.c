@@ -42,10 +42,10 @@ void MPU6050_LinkTest(void){
     uint8_t WHO_AM_I;
     I2C_ReadReg(MPU6050_SLAVE_ADDRESS, MPU6050_WHO_AM_I, &WHO_AM_I, 1);
     if(WHO_AM_I == 0x68){
-        Ble
+        Bluetooth_SendString("MPU6050连接成功\r\n");
     }
     else {
-        Usart3_SendString("MPU6050连接失败\r\n");
+        Bluetooth_SendString("MPU6050连接失败\r\n");
     }
 }
 

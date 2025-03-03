@@ -7,7 +7,7 @@
 
 //72M 1us = 72
 void I2C_Delay(void){
-    for (size_t i = 0; i < 72; i++)
+    for (uint8_t i = 0; i < 72; i++)
     {
         ;
     }
@@ -73,7 +73,7 @@ uint8_t I2C_WaitAck(void){
 }
 
 void I2C_SendByte(uint8_t byte){
-    for (size_t i = 0; i < 8; i++)
+    for (uint8_t i = 0; i < 8; i++)
     {
         SCL_OUT(0); //拉低SCL,准备发送数据
         if(byte & 0x80){
@@ -90,7 +90,7 @@ void I2C_SendByte(uint8_t byte){
 uint8_t I2C_ReceiveByte(void){
     SDA_OUT(1);
     uint8_t byte = 0;
-    for (size_t i = 0; i < 8; i++)
+    for (uint8_t i = 0; i < 8; i++)
     {
         byte <<= 1;
         SCL_OUT(0);
@@ -124,7 +124,7 @@ uint8_t I2C_ReadReg(uint8_t slaveAddr, uint8_t reg, uint8_t* buff, uint8_t len){
     I2C_Start();
     I2C_SendByte(slaveAddr | 0x01);
     I2C_WaitAck();
-    for (size_t i = 0; i < len; i++)
+    for (uint8_t i = 0; i < len; i++)
     {
         data = I2C_ReceiveByte();
         if(i == len - 1){
