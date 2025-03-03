@@ -1,9 +1,8 @@
 
-
-#include "usart3.h"
-#include "oled.h"
 #include "motor.h"
 #include "bluetooth.h"
+#include "mpu6050.h"
+#include "oled.h"
 extern u8 rxbuff;
 extern u8 rxflag;
 
@@ -40,15 +39,21 @@ int main()
     //     rxflag = 0;
     //    }
         //电机测试
-        Motor_Load(100, 100);
-        OLED_ShowString(0, 0, "Motor Forward");
-        delay_ms(50);OLED_Clear();
-        Motor_Load(-100, -100);
-        OLED_ShowString(0, 0, "Motor Backward");
+        // Motor_Load(50, 50);
+        // OLED_ShowString(1, 1, "Motor Forward");
+        // delay_ms(50);OLED_Clear();
+        // Motor_Load(-50, -50);
+        // OLED_ShowString(1, 1, "Motor Backward");
+        // delay_ms(50);
+        // Motor_Load(0, 0);OLED_Clear();
+        // OLED_ShowString(1, 1, "Motor Stop");
+        // delay_ms(50);OLED_Clear();
+        //MPU6050测试
+        MPU6050_Init();
+        uint8_t test = MPU6050_LinkTest();
+        OLED_ShowString(1, 1, "MPU6050 Test:");
+        OLED_ShowNum(2, 1, test, 3);  //0x68=104
         delay_ms(50);
-        Motor_Load(0, 0);OLED_Clear();
-        OLED_ShowString(0, 0, "Motor Stop");
-        delay_ms(50);OLED_Clear();
     }
     
 }

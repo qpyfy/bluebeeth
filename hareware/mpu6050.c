@@ -33,20 +33,15 @@ void MPU6050_Init(void){
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 
-    
+    MPU6050_WakeUp();
 }
 /*
 测试MPU6050是否连接成功
 */
-void MPU6050_LinkTest(void){
-    uint8_t WHO_AM_I;
+uint8_t MPU6050_LinkTest(void){
+    uint8_t WHO_AM_I = 0x00;
     I2C_ReadReg(MPU6050_SLAVE_ADDRESS, MPU6050_WHO_AM_I, &WHO_AM_I, 1);
-    if(WHO_AM_I == 0x68){
-        Bluetooth_SendString("MPU6050连接成功\r\n");
-    }
-    else {
-        Bluetooth_SendString("MPU6050连接失败\r\n");
-    }
+    return WHO_AM_I;
 }
 
 void MPU6050_WriteReg(uint8_t reg, uint8_t data){

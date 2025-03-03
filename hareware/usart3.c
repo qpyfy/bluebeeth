@@ -51,11 +51,6 @@ void Usart3_SendString(char* str){
         Usart3_SendByte(*str++);
     }
 }
-
-uint8_t Usart3_ReceiveByte(void){
-     return rxdata[0];
-}
-
 #define BUFF_SIZE 128
 
 u8 rxdata[BUFF_SIZE];
@@ -63,6 +58,9 @@ u8 rxbuff[BUFF_SIZE];
 u8 rxlen = 0;
 
 
+u8 Usart3_ReceiveByte(void){
+     return rxdata[rxlen];
+}
 
 void ClearBuff(void){
     for (uint8_t i = 0; i < rxlen; i++)

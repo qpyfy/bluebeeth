@@ -20,6 +20,7 @@ void Motor_Init(void){
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
 
+
 }
 
 #define MOTOR_SPEED 100
@@ -31,9 +32,10 @@ void Limit_Speed(uint8_t *motor1, uint8_t *motor2){
     if(*motor2 > MOTOR_SPEED){
         *motor2 = MOTOR_SPEED;
     }
+    *motor2 = -*motor2; //取反让电机同向
 }
 
-uint8_t abs(int8_t num){
+uint32_t abs(int32_t num){
     return num > 0 ? num : -num;
 }
 /*
@@ -52,17 +54,17 @@ void Motor_Load(uint8_t motor1, uint8_t motor2){
     else {
         GPIO_ResetBits(GPIOB, MOTOR_AIN1);
         GPIO_SetBits(GPIOB, MOTOR_AIN2);
-        PWM_SetDutyCycle(abs(motor1));
+        PWMA_SetDutyCycle(abs(motor1));
     }
 
     if (motor2 > 0){
         GPIO_SetBits(GPIOB, MOTOR_BIN1);
         GPIO_ResetBits(GPIOB, MOTOR_BIN2);
-        PWM_SetDutyCycle(abs(motor2));
+        PWMB_SetDutyCycle(abs(motor2));
     }
     else {
         GPIO_ResetBits(GPIOB, MOTOR_BIN1);
         GPIO_SetBits(GPIOB, MOTOR_BIN2);
-        PWM_SetDutyCycle(abs(motor2));
+        PWMB_SetDutyCycle(abs(motor2));
     }
 }

@@ -30,4 +30,28 @@
 #define	MPU6050_PWR_MGMT_2		0x6C     //电源管理2
 #define	MPU6050_WHO_AM_I		0x75     //设备ID
 
+
+void MPU6050_Init(void);
+/*
+测试MPU6050是否连接成功
+*/
+uint8_t MPU6050_LinkTest(void);
+void MPU6050_WriteReg(uint8_t reg, uint8_t data);
+/*
+@note 复位MPU6050
+*/
+void MPU6050_Reset(void);
+/*
+@note 唤醒MPU6050
+*/
+void MPU6050_WakeUp(void);
+/*
+@param config 分辨率 0~3
+@note 0: ±250°/s   1: ±500°/s
+@note 2: ±1000°/s  3: ±2000°/s
+*/
+void MPU6050_SetGyroConfig(uint8_t config);
+
+void MPU6050_SetAccelConfig(uint8_t config);
+
 #endif // !MPU6050_H

@@ -7,7 +7,7 @@ pin_8 控制电机B 速度
 
 void PWM_Init(void){
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM1, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
 
     GPIO_InitTypeDef GPIO_InitStructure;
     GPIO_StructInit(&GPIO_InitStructure);
@@ -39,6 +39,9 @@ void PWM_Init(void){
     TIM_ARRPreloadConfig(TIM1, ENABLE);
 
     TIM_Cmd(TIM1, ENABLE);
+
+     // 启用 PWM 输出
+     TIM_CtrlPWMOutputs(TIM1, ENABLE);
 }
 
 /*
