@@ -87,9 +87,9 @@ void I2C_SendByte(uint8_t byte){
     }
 }
 
-uint8_t I2C_ReadByte(void){
-    uint8_t byte = 0;
+uint8_t I2C_ReceiveByte(void){
     SDA_OUT(1);
+    uint8_t byte = 0;
     for (size_t i = 0; i < 8; i++)
     {
         byte <<= 1;
@@ -102,3 +102,40 @@ uint8_t I2C_ReadByte(void){
     }
     return byte;
 }
+
+void I2C_WriteReg(uint8_t slaveAddr, uint8_t reg, uint8_t data){
+    I2C_Start();
+    I2C_SendByte(slaveAddr);
+    I2C_WaitAck();
+    I2C_SendByte(reg);
+    I2C_WaitAck();
+    I2C_SendByte(data);
+    I2C_WaitAck();
+    I2C_Stop();
+}
+
+uint8_t I2C_ReadReg(uint8_t slaveAddr, uint8_t reg, uint8_t* buff, uint8_t len){
+    uint8_t data;
+    I2C_Start();
+    I2C_SendByte(slaveAddr);
+    I2C_WaitAck();
+    I2C_SendByte(reg);
+    I2C_WaitAck();
+    I2C_Start();
+    I2C_SendByte(slaveAddr | 0x01);
+    I2C_WaitAck();
+    for (size_t i = 0; i < len; i++)
+    {
+        data = I2C_ReceiveByte();
+        if(i == len - 1){
+            I2C_NoAck();
+        }
+        else {
+            I2C_Ack();
+        }
+        buff[i] = data;
+    }
+    I2C_Stop();
+    return 1;
+}
+

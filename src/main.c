@@ -3,8 +3,8 @@
 #include "usart3.h"
 #include "oled.h"
 #include "motor.h"
-
-extern u8 rxdata;
+#include "bluetooth.h"
+extern u8 rxbuff;
 extern u8 rxflag;
 
 
@@ -26,10 +26,8 @@ void delay_ms(uint8_t x){
 int main()
 {
     OLED_Init();
-    Usart3_Init();
+    Bluetooth_Init();
     Motor_Init();
-    Usart3_SendString("Hello World!\n");
-
     OLED_Clear();
     while (1)
     {
@@ -38,7 +36,7 @@ int main()
        {
         OLED_Clear();
         OLED_ShowString(0, 0, "RX:");
-        OLED_ShowHexNum(0, 2, rxdata, sizeof(rxdata));
+        OLED_ShowHexNum(0, 2, rxbuff, sizeof(rxbuff));
         rxflag = 0;
        }
         //电机测试

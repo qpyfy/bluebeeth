@@ -32,7 +32,11 @@ void Limit_Speed(uint8_t *motor1, uint8_t *motor2){
         *motor2 = MOTOR_SPEED;
     }
 }
-
+/*
+@param motor1 电机A速度 motor2 电机B速度
+@note 电机速度范围-100~100
+@note 电机速度为正数时电机正转，为负数时电机反转
+*/
 void Motor_Load(uint8_t motor1, uint8_t motor2){
     Limit_Speed(&motor1, &motor2);
     if(motor1 > 0){

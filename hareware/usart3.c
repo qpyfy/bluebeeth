@@ -51,15 +51,44 @@ void Usart3_SendString(char* str){
         Usart3_SendByte(*str++);
     }
 }
+/*
+@return 上次接收到的数据
+*/
+uint8_t Usart3_ReceiveByte(void){
+    return rxdata;
+}
 
-u8 rxdata;
-u8 rxflag = 0;
+#define BUFF_SIZE 128
+
+u8 rxdata[BUFF_SIZE];
+u8 rxbuff[BUFF_SIZE];
+u8 rxlen = 0;
+
+
+
+void ClearBuff(void){
+    for (size_t i = 0; i < rxlen; i++)
+    {
+        rxbuff[i] = 0;
+    }
+    rxlen = 0;
+    
+}
+/*
+@note 用于处理蓝牙接收到的数据
+*/
 void USART3_IRQHandler(void){
     if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET){
-        rxdata = USART_ReceiveData(USART3);
-        //TODO 处理接收到的数据
-        rxflag = 1;
-
+        u8 data = USART_ReceiveData(USART3);
+        if(data != '\n'){
+            rxbuff[rxlen++] = data;
+        }
+        else {
+            rxdata = rxbuff;
+            ClearBuff();
+        }
+        
         USART_ClearITPendingBit(USART3, USART_IT_RXNE);
     }
 }
+
