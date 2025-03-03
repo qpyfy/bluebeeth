@@ -1,5 +1,9 @@
 #include "pwm.h"
 
+/*
+pin_11 控制电机A 速度
+pin_8 控制电机B 速度
+*/
 
 void PWM_Init(void){
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);

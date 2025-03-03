@@ -1,5 +1,8 @@
 #include "motor.h"
-
+/*
+pin_12 13 控制电机A
+pin_14 15 控制电机B
+*/
 #define MOTOR_AIN1 GPIO_Pin_12
 #define MOTOR_AIN2 GPIO_Pin_13
 
