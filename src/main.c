@@ -3,30 +3,25 @@
 #include "bluetooth.h"
 #include "mpu6050.h"
 #include "oled.h"
+#include "delay.h"
+
+//蓝牙接收缓冲区
 extern u8 rxbuff;
 extern u8 rxflag;
-
-
+extern u8 rxlen;
+//MPU6050数据
+extern int16_t yaw, pitch, roll;
+extern int16_t x, y, z;
+extern int16_t temp;
 //72MHZ 1ms i=72000
-void delay_ms(uint32_t x){
-    while(x--){
-        for (uint8_t i = 0; i < 72; i++)
-        {
-            for (uint8_t j = 0; j < 1000; j++)
-            {
-                
-            }
-            
-        }
-        
-    }
-}
 
 int main()
-{
+{  
     OLED_Init();
     Bluetooth_Init();
     Motor_Init();
+    MPU6050_Init();
+    
     OLED_Clear();
     while (1)
     {
@@ -49,11 +44,32 @@ int main()
         // OLED_ShowString(1, 1, "Motor Stop");
         // delay_ms(50);OLED_Clear();
         //MPU6050测试
-        MPU6050_Init();
-        uint8_t test = MPU6050_LinkTest();
+        u8 test = MPU6050_GetID();
+        
         OLED_ShowString(1, 1, "MPU6050 Test:");
-        OLED_ShowNum(2, 1, test, 3);  //0x68=104
-        delay_ms(50);
+        OLED_ShowNum(2, 1, test, 4);
+        delay_ms(500);OLED_Clear();
+
+        // OLED_ShowString(1, 1, "Y:");
+        // OLED_ShowNum(1, 3, yaw, 3);
+        // OLED_ShowString(1, 7, "P:");
+        // OLED_ShowNum(1, 9, pitch, 3);
+        // OLED_ShowString(1, 13, "R:");
+        // OLED_ShowNum(1, 15, roll, 3);
+        // OLED_ShowString(2, 1, "X:");
+        // OLED_ShowNum(2, 3, x, 3);
+        // OLED_ShowString(2, 7, "Y:");
+        // OLED_ShowNum(2, 9, y, 3);
+        // OLED_ShowString(2, 13, "Z:");
+        // OLED_ShowNum(2, 15, z, 3);
+        // OLED_ShowString(3, 1, "T:");
+        // OLED_ShowNum(3, 3, temp, 3);
+        // delay_ms(50);
+        // OLED_Clear();
+
+    
+
+
     }
     
 }

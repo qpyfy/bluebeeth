@@ -5,7 +5,8 @@
   "srcDirs": [
     "src",
     "hal",
-    "hareware"
+    "hareware",
+    "sys"
   ],
   "outDir": "build",
   "deviceName": "STM32F102C8",
@@ -106,10 +107,12 @@
           "hal/STM32F10x_StdPeriph_Driver",
           "hal/STM32F10x_StdPeriph_Driver/inc",
           "hal/STM32F10x_StdPeriph_Driver/src",
-          "hareware"
+          "hareware",
+          "sys"
         ],
         "libList": [
-          "hareware"
+          "hareware",
+          "sys"
         ],
         "defineList": [
           "USE_STDPERIPH_DRIVER",

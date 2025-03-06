@@ -1,88 +1,112 @@
-#include "mpu6050.h"
-//MPU6050地址 0x68
-//MPU6050的I2C地址为0x68，读写时最后一位（bit0）为0表示写，为1表示读。
-//写：0xD0 读：0xD1
-//MPU6050内部寄存器地址
+#include "stm32f10x.h"                  // Device header
+#include "i2c.h"
+#include "mpu6050_reg.h"
 
+#define MPU6050_ADDRESS		0xD0		//MPU6050的I2C从机地址
 
-void MPU6050_Init(void){
-    I2C_GPIO_Init();
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
-    GPIO_InitTypeDef GPIO_InitStructure;
-    GPIO_StructInit(&GPIO_InitStructure);
-
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOB, &GPIO_InitStructure);
-
-    //外部中断
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE); 
-    GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource5); //启用GPIOB_PIN5外部中断
-    EXTI_InitTypeDef EXTI_InitStructure;
-    EXTI_InitStructure.EXTI_Line = EXTI_Line5;
-    EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-    EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
-    EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-    EXTI_Init(&EXTI_InitStructure);
-
-    NVIC_InitTypeDef NVIC_InitStructure;
-    NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStructure);
-
-    MPU6050_WakeUp();
-}
-/*
-测试MPU6050是否连接成功
-*/
-uint8_t MPU6050_LinkTest(void){
-    uint8_t WHO_AM_I = 0x00;
-    I2C_ReadReg(MPU6050_SLAVE_ADDRESS, MPU6050_WHO_AM_I, &WHO_AM_I, 1);
-    return WHO_AM_I;
+/**
+  * 函    数：MPU6050写寄存器
+  * 参    数：RegAddress 寄存器地址，范围：参考MPU6050手册的寄存器描述
+  * 参    数：Data 要写入寄存器的数据，范围：0x00~0xFF
+  * 返 回 值：无
+  */
+void MPU6050_WriteReg(uint8_t RegAddress, uint8_t Data)
+{
+	I2C_Start();						//I2C起始
+	I2C_SendByte(MPU6050_ADDRESS);	//发送从机地址，读写位为0，表示即将写入
+	I2C_ReceiveAck();					//接收应答
+	I2C_SendByte(RegAddress);			//发送寄存器地址
+	I2C_ReceiveAck();					//接收应答
+	I2C_SendByte(Data);				//发送要写入寄存器的数据
+	I2C_ReceiveAck();					//接收应答
+	I2C_Stop();						//I2C终止
 }
 
-void MPU6050_WriteReg(uint8_t reg, uint8_t data){
-    I2C_WriteReg(MPU6050_SLAVE_ADDRESS, reg, data);
-}
-/*
-@note 复位MPU6050
-*/
-void MPU6050_Reset(void){
-    MPU6050_WriteReg(MPU6050_PWR_MGMT_1, 0x80);
-}
-/*
-@note 唤醒MPU6050
-*/
-void MPU6050_WakeUp(void){
-    MPU6050_WriteReg(MPU6050_PWR_MGMT_1, 0x00);
-}
-/*
-@param config 分辨率 0~3
-@note 0: ±250°/s   1: ±500°/s
-@note 2: ±1000°/s  3: ±2000°/s
-*/
-void MPU6050_SetGyroConfig(uint8_t config){
-    config = config > 3 ? 3 : (config < 0 ? 0 : config); //限制config范围0-3
-    MPU6050_WriteReg(MPU6050_GYRO_CONFIG, config);
-}
-
-void MPU6050_SetAccelConfig(uint8_t config){
-    config = config > 3 ? 3 : (config < 0 ? 0 : config); //限制config范围0-3
-    MPU6050_WriteReg(MPU6050_ACCEL_CONFIG, config);
+/**
+  * 函    数：MPU6050读寄存器
+  * 参    数：RegAddress 寄存器地址，范围：参考MPU6050手册的寄存器描述
+  * 返 回 值：读取寄存器的数据，范围：0x00~0xFF
+  */
+uint8_t MPU6050_ReadReg(uint8_t RegAddress)
+{
+	uint8_t Data;
+	
+	I2C_Start();						//I2C起始
+	I2C_SendByte(MPU6050_ADDRESS);	//发送从机地址，读写位为0，表示即将写入
+	I2C_ReceiveAck();					//接收应答
+	I2C_SendByte(RegAddress);			//发送寄存器地址
+	I2C_ReceiveAck();					//接收应答
+	
+	I2C_Start();						//I2C重复起始
+	I2C_SendByte(MPU6050_ADDRESS | 0x01);	//发送从机地址，读写位为1，表示即将读取
+	I2C_ReceiveAck();					//接收应答
+	Data = I2C_ReceiveByte();			//接收指定寄存器的数据
+	I2C_SendAck(1);					//发送应答，给从机非应答，终止从机的数据输出
+	I2C_Stop();						//I2C终止
+	
+	return Data;
 }
 
-void MPU6050_ReadReg(uint8_t reg, uint8_t* buff, uint8_t len){
-    I2C_ReadReg(MPU6050_SLAVE_ADDRESS, reg, buff, len);
+/**
+  * 函    数：MPU6050初始化
+  * 参    数：无
+  * 返 回 值：无
+  */
+void MPU6050_Init(void)
+{
+	I2C_GPIO_Init();									//先初始化底层的I2C
+	
+	/*MPU6050寄存器初始化，需要对照MPU6050手册的寄存器描述配置，此处仅配置了部分重要的寄存器*/
+	MPU6050_WriteReg(MPU6050_PWR_MGMT_1, 0x01);		//电源管理寄存器1，取消睡眠模式，选择时钟源为X轴陀螺仪
+	MPU6050_WriteReg(MPU6050_PWR_MGMT_2, 0x00);		//电源管理寄存器2，保持默认值0，所有轴均不待机
+	MPU6050_WriteReg(MPU6050_SMPLRT_DIV, 0x09);		//采样率分频寄存器，配置采样率
+	MPU6050_WriteReg(MPU6050_CONFIG, 0x06);			//配置寄存器，配置DLPF
+	MPU6050_WriteReg(MPU6050_GYRO_CONFIG, 0x18);	//陀螺仪配置寄存器，选择满量程为±2000°/s
+	MPU6050_WriteReg(MPU6050_ACCEL_CONFIG, 0x18);	//加速度计配置寄存器，选择满量程为±16g
 }
 
+/**
+  * 函    数：MPU6050获取ID号
+  * 参    数：无
+  * 返 回 值：MPU6050的ID号
+  */
+uint8_t MPU6050_GetID(void)
+{
+	return MPU6050_ReadReg(MPU6050_WHO_AM_I);		//返回WHO_AM_I寄存器的值
+}
 
-
-void EXTI9_5_IRQHandler(void){
-    if(EXTI_GetITStatus(EXTI_Line5) != RESET){
-        EXTI_ClearITPendingBit(EXTI_Line5);
-        //TODO 处理陀螺仪数据
-    }
+/**
+  * 函    数：MPU6050获取数据
+  * 参    数：AccX AccY AccZ 加速度计X、Y、Z轴的数据，使用输出参数的形式返回，范围：-32768~32767
+  * 参    数：GyroX GyroY GyroZ 陀螺仪X、Y、Z轴的数据，使用输出参数的形式返回，范围：-32768~32767
+  * 返 回 值：无
+  */
+void MPU6050_GetData(int16_t *AccX, int16_t *AccY, int16_t *AccZ, 
+						int16_t *GyroX, int16_t *GyroY, int16_t *GyroZ)
+{
+	uint8_t DataH, DataL;								//定义数据高8位和低8位的变量
+	
+	DataH = MPU6050_ReadReg(MPU6050_ACCEL_XOUT_H);		//读取加速度计X轴的高8位数据
+	DataL = MPU6050_ReadReg(MPU6050_ACCEL_XOUT_L);		//读取加速度计X轴的低8位数据
+	*AccX = (DataH << 8) | DataL;						//数据拼接，通过输出参数返回
+	
+	DataH = MPU6050_ReadReg(MPU6050_ACCEL_YOUT_H);		//读取加速度计Y轴的高8位数据
+	DataL = MPU6050_ReadReg(MPU6050_ACCEL_YOUT_L);		//读取加速度计Y轴的低8位数据
+	*AccY = (DataH << 8) | DataL;						//数据拼接，通过输出参数返回
+	
+	DataH = MPU6050_ReadReg(MPU6050_ACCEL_ZOUT_H);		//读取加速度计Z轴的高8位数据
+	DataL = MPU6050_ReadReg(MPU6050_ACCEL_ZOUT_L);		//读取加速度计Z轴的低8位数据
+	*AccZ = (DataH << 8) | DataL;						//数据拼接，通过输出参数返回
+	
+	DataH = MPU6050_ReadReg(MPU6050_GYRO_XOUT_H);		//读取陀螺仪X轴的高8位数据
+	DataL = MPU6050_ReadReg(MPU6050_GYRO_XOUT_L);		//读取陀螺仪X轴的低8位数据
+	*GyroX = (DataH << 8) | DataL;						//数据拼接，通过输出参数返回
+	
+	DataH = MPU6050_ReadReg(MPU6050_GYRO_YOUT_H);		//读取陀螺仪Y轴的高8位数据
+	DataL = MPU6050_ReadReg(MPU6050_GYRO_YOUT_L);		//读取陀螺仪Y轴的低8位数据
+	*GyroY = (DataH << 8) | DataL;						//数据拼接，通过输出参数返回
+	
+	DataH = MPU6050_ReadReg(MPU6050_GYRO_ZOUT_H);		//读取陀螺仪Z轴的高8位数据
+	DataL = MPU6050_ReadReg(MPU6050_GYRO_ZOUT_L);		//读取陀螺仪Z轴的低8位数据
+	*GyroZ = (DataH << 8) | DataL;						//数据拼接，通过输出参数返回
 }

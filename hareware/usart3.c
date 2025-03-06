@@ -28,11 +28,14 @@ void Usart3_Init(void){
     USART_Init(USART3, &USART_InitStructure);
 
     USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
+
     NVIC_EnableIRQ(USART3_IRQn);
+
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
     NVIC_InitTypeDef NVIC_InitStructure;
     NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0; //抢占优先级
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0; //响应优先级
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2; //抢占优先级
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2; //响应优先级
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 
