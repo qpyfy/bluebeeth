@@ -56,9 +56,10 @@ void MPU6050_Init(void)
 	MPU6050_WriteReg(MPU6050_CONFIG, 0x06);			//配置寄存器，配置DLPF
 	MPU6050_WriteReg(MPU6050_GYRO_CONFIG, 0x18);	//陀螺仪配置寄存器，选择满量程为±2000°/s
 	MPU6050_WriteReg(MPU6050_ACCEL_CONFIG, 0x18);	//加速度计配置寄存器，选择满量程为±16g
-	MPU6050_WriteReg(MPU6050_INT_ENABLE, 0X80);     //中断使能寄存器，使能INT_PIN_INTERRUPT
+	MPU6050_WriteReg(MPU6050_INT_ENABLE, 0X01);     //中断使能寄存器，使能INT_PIN_INTERRUPT
 	MPU6050_WriteReg(MPU6050_INT_PIN_CFG, 0x30);        // 中断引脚配置寄存器，配置中断引脚为开漏输出，低电平有效
-	//TODO 配置中断引脚
+	
+    //TODO 配置中断引脚
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
 	GPIO_InitTypeDef GPIO_InitStruct;
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5;
@@ -127,27 +128,3 @@ void MPU6050_GetData(int16_t *AccX, int16_t *AccY, int16_t *AccZ,
 	*GyroZ = (DataH << 8) | DataL;						//数据拼接，通过输出参数返回
 }
 
-
-void EXTI9_5_IRQHandler(void){
-	static int16_t ax, ay, az, gx, gy, gz;
-	if(EXTI_GetITStatus(EXTI_Line5) != RESET){
-		EXTI_ClearITPendingBit(EXTI_Line5);
-		MPU6050_GetData(&ax,&ay, &az, &gx, &gy, &gz); 
-
-		OLED_ShowString(1, 1, "ax:");
-		OLED_ShowSignedNum(1, 4, ax, 5);
-		OLED_ShowString(1, 9, "ay:");
-		OLED_ShowSignedNum(1, 14, ay, 5);
-		OLED_ShowString(2, 1, "az:");
-		OLED_ShowSignedNum(2, 4, az, 5);
-		OLED_ShowString(2, 9, "gx:");
-		OLED_ShowSignedNum(2, 14, gx, 5);
-		OLED_ShowString(3, 1, "gy:");
-		OLED_ShowSignedNum(3, 4, gy, 5);
-		OLED_ShowString(3, 9, "gz:");
-		OLED_ShowSignedNum(3, 14, gz, 5);
-
-	}
-
-
-}
