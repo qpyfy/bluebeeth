@@ -1,4 +1,3 @@
-
 #include "motor.h"
 #include "bluetooth.h"
 #include "mpu6050.h"
@@ -21,7 +20,7 @@ int main()
     Bluetooth_Init();
     Motor_Init();
     MPU6050_Init();
-    
+    delay_ms(10);
     OLED_Clear();
     while (1)
     {
@@ -33,6 +32,7 @@ int main()
     //     OLED_ShowHexNum(0, 2, rxbuff, sizeof(rxbuff));
     //     rxflag = 0;
     //    }
+    //  通过
         //电机测试
         // Motor_Load(50, 50);
         // OLED_ShowString(1, 1, "Motor Forward");
@@ -43,11 +43,15 @@ int main()
         // Motor_Load(0, 0);OLED_Clear();
         // OLED_ShowString(1, 1, "Motor Stop");
         // delay_ms(50);OLED_Clear();
+        // 
         //MPU6050测试
         u8 test = MPU6050_GetID();
         
         OLED_ShowString(1, 1, "MPU6050 Test:");
         OLED_ShowNum(2, 1, test, 4);
+        if (test == 0) {
+            OLED_ShowString(3, 1, "Error: ID=0");
+        }
         delay_ms(500);OLED_Clear();
 
         // OLED_ShowString(1, 1, "Y:");
