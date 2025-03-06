@@ -9,9 +9,9 @@ extern u8 rxbuff;
 extern u8 rxflag;
 extern u8 rxlen;
 //MPU6050数据
-extern int16_t yaw, pitch, roll;
-extern int16_t x, y, z;
-extern int16_t temp;
+int16_t yaw, pitch, roll;
+int16_t x, y, z;
+int16_t temp;
 //72MHZ 1ms i=72000
 
 int main()
@@ -45,14 +45,8 @@ int main()
         // delay_ms(50);OLED_Clear();
         // 
         //MPU6050测试
-        u8 test = MPU6050_GetID();
+        // MPU6050_GetData(&x, &y, &z, &yaw, &pitch, &roll);
         
-        OLED_ShowString(1, 1, "MPU6050 Test:");
-        OLED_ShowNum(2, 1, test, 4);
-        if (test == 0) {
-            OLED_ShowString(3, 1, "Error: ID=0");
-        }
-        delay_ms(500);OLED_Clear();
 
         // OLED_ShowString(1, 1, "Y:");
         // OLED_ShowNum(1, 3, yaw, 3);
@@ -68,10 +62,7 @@ int main()
         // OLED_ShowNum(2, 15, z, 3);
         // OLED_ShowString(3, 1, "T:");
         // OLED_ShowNum(3, 3, temp, 3);
-        // delay_ms(50);
-        // OLED_Clear();
 
-    
 
 
     }
