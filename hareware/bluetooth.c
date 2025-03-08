@@ -1,5 +1,7 @@
 #include "bluetooth.h"
 
+u8 direction = STOP;
+
 void Bluetooth_Init(void){
     Usart3_Init();
     Bluetooth_SendString("Bluetooth Init Success!\r\n");

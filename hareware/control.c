@@ -3,6 +3,7 @@
 #include "oled.h"
 #include  "motor.h"
 #include "encoder.h"
+#include "bluetooth.h"
 
 #include "eMPL/inv_mpu.h" //mpu6050库
 #include "eMPL/inv_mpu_dmp_motion_driver.h" //mpu6050 dmp库
@@ -16,19 +17,49 @@
 
 int16_t ax, ay, az, gx, gy, gz;
 float yaw, pitch, roll;
+int16_t speed = 0, turn = 0;
+extern u8 direction;
 
 u16 VelocityControl(u16 target);
 u16 BalanceControl(u16 target);
+u16 TurnControl(u16 target);
+
+
 void EXTI9_5_IRQHandler(void){
 	if(EXTI_GetITStatus(EXTI_Line5) != RESET){
 		EXTI_ClearITPendingBit(EXTI_Line5);
 		MPU6050_GetData(&ax,&ay, &az, &gx, &gy, &gz); 
 		mpu_dmp_get_data(&pitch, &roll, &yaw);
-        //TODO 控制电机
-		u16 velocity = VelocityControl(0);
-		u16 balance = BalanceControl(velocity);
+        //控制电机
 
-		Motor_Load(balance, balance);
+		if(direction == STOP){
+			speed = 0;
+			turn = 0;
+		}
+		else if (direction == FORWARD)
+		{
+			speed++;
+		}
+		else if (direction == BACKWARD)
+		{
+			speed++;
+		}
+		else if (direction == RIGHT)
+		{
+			speed = 0;
+			turn = 30;
+		}
+		else if (direction == LEFT)
+		{
+			speed = 0;
+			turn = -30;
+		}
+		
+		u16 velocity = VelocityControl(speed);
+		u16 pwm_out = BalanceControl(velocity);
+		u16 turn_out = TurnControl(turn);
+
+		Motor_Load(pwm_out + turn_out, pwm_out - turn_out);
 	}
  
 }
@@ -38,7 +69,7 @@ u16 VelocityControl(u16 target){
 	static u16 err_last = 0, err_speed = 0, err_out = 0, err_sum = 0;
 
 	//低通滤波
-	left_speed = Encoder_GetValue(1);right_speed = Encoder_GetValue(2);
+	left_speed = Encoder_GetValue(1);right_speed = -Encoder_GetValue(2);
 	err_speed  = (left_speed + right_speed) - target; // 速度误差
 	err_out = (1 - LPF_COEFFICIENT) * err_speed + LPF_COEFFICIENT * err_last; // 低通滤波
 	err_sum += err_out; // 误差积分
@@ -62,3 +93,9 @@ u16 BalanceControl(u16 target){
 	return (u16)(BALANCE_KP * (target - yaw) + BALANCE_KD * (0 - gy));
 }
 
+
+//转向环PD
+u16 TurnControl(u16 target){
+	//PD
+	return (u16)(BALANCE_KP * (target - 0) + BALANCE_KD * (0 - gz));
+}

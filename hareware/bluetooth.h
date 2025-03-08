@@ -4,6 +4,17 @@
 #include "stm32f10x.h"
 #include "usart3.h"
 
+
+enum Direction{
+    STOP = 0,
+    FORWARD,
+    BACKWARD,
+    LEFT,
+    RIGHT
+};
+
+
+
 void Bluetooth_Init(void);
 
 void Bluetooth_SendByte(uint8_t byte);

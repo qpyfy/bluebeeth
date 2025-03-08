@@ -1,5 +1,5 @@
 #include "usart3.h"
-
+#include "bluetooth.h"
 
 
 void Usart3_Init(void){
@@ -62,7 +62,7 @@ u8 rxlen = 0;
 
 
 u8 Usart3_ReceiveByte(void){
-     return rxdata[rxlen];
+     return rxdata[rxlen--];
 }
 
 void ClearBuff(void){
@@ -73,24 +73,16 @@ void ClearBuff(void){
     rxlen = 0;
     
 }
+
+extern u8 direction;
 /*
 @note 用于处理蓝牙接收到的数据
 */
 void USART3_IRQHandler(void){
     if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET){
         u8 data = USART_ReceiveData(USART3);
-        if(data != '\n'){
-            rxbuff[rxlen++] = data;
-        }
-        else {
-            for (uint8_t i = 0; i < rxlen; i++)
-            {
-                rxdata[i] = rxbuff[i];
-            }
-            rxlen = 0;
-            ClearBuff();
-        }
-        
+            if(data >= 0 && data <= 4)direction = data;
+            else rxbuff[rxlen++] = data;
         USART_ClearITPendingBit(USART3, USART_IT_RXNE);
     }
 }
