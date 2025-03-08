@@ -3,14 +3,22 @@
 #include "mpu6050.h"
 #include "oled.h"
 #include "delay.h"
+#include "eMPL/inv_mpu.h"
+#include "eMPL/inv_mpu_dmp_motion_driver.h"
 
 //蓝牙接收缓冲区
 extern u8 rxbuff;
 extern u8 rxflag;
 extern u8 rxlen;
 //MPU6050数据
-
+extern int16_t ax, ay, az, gx, gy, gz;
+extern float yaw, pitch, roll;
 //72MHZ 1ms i=72000
+
+void FloatToString(float f, char *s)
+{
+    
+}
 
 int main()
 {  
@@ -18,6 +26,7 @@ int main()
     Bluetooth_Init();
     Motor_Init();
     MPU6050_Init();
+    mpu_dmp_init();
     delay_ms(10);
     OLED_Clear();
     while (1)
@@ -44,7 +53,9 @@ int main()
         // 
         //MPU6050测试
         // MPU6050_GetData(&x, &y, &z, &yaw, &pitch, &roll);
-        
+        OLED_ShowSignedNum(1, 1, yaw, 3);
+        OLED_ShowNum(2, 1, pitch, 3);
+        OLED_ShowNum(3, 1, roll, 3);
 
         // OLED_ShowString(1, 1, "Y:");
         // OLED_ShowNum(1, 3, yaw, 3);
