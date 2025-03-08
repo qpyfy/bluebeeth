@@ -111,7 +111,7 @@ void MPU6050_Init(void)
 		MPU6050_WriteReg(MPU_PWR_MGMT2_REG,0X00);	//加速度与陀螺仪都工作
 		MPU_Set_Rate(100);						//设置采样率为50Hz
  	}
-    //TODO 配置中断引脚
+    //配置中断引脚
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
 	GPIO_InitTypeDef GPIO_InitStruct;
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5;
