@@ -16,7 +16,6 @@ void MPU6050_WriteReg(uint8_t RegAddress, uint8_t Data)
 	I2C_SendByte(Data);				//发送要写入寄存器的数据
 	I2C_ReceiveAck();					//接收应答
 	I2C_Stop();						//I2C终止
-	return 0;
 }
 
 u8 MPU_Write_Len(u8 addr,u8 reg,u8 len,u8 *buf){
@@ -82,17 +81,17 @@ void MPU6050_Init(void)
 {
 	I2C_GPIO_Init();									//先初始化底层的I2C
 	// 复位MPU6050
-	MPU6050_WriteReg(MPU6050_PWR_MGMT_1, 0x80);
+	MPU6050_WriteReg(MPU6050_PWR_MGMT_1, 0x80);     //复位
 	/*MPU6050寄存器初始化，需要对照MPU6050手册的寄存器描述配置，此处仅配置了部分重要的寄存器*/
 	MPU6050_WriteReg(MPU6050_PWR_MGMT_1, 0x01);		//电源管理寄存器1，取消睡眠模式，选择时钟源为X轴陀螺仪
 	MPU6050_WriteReg(MPU6050_SMPLRT_DIV, 0x09);		//采样率分频寄存器，配置采样率
 	MPU6050_WriteReg(MPU6050_CONFIG, 0x06);			//配置寄存器，配置DLPF
 	MPU6050_WriteReg(MPU6050_GYRO_CONFIG, 0x18);	//陀螺仪配置寄存器，选择满量程为±2000°/s
 	MPU6050_WriteReg(MPU6050_ACCEL_CONFIG, 0x18);	//加速度计配置寄存器，选择满量程为±16g
-	MPU6050_WriteReg(MPU6050_INT_ENABLE, 0X01);     //中断使能寄存器，使能INT_PIN_INTERRUPT
+	MPU6050_WriteReg(MPU_INTBP_CFG_REG,0X80);	//INT引脚低电平有效
 	
     //TODO 配置中断引脚
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
 	GPIO_InitTypeDef GPIO_InitStruct;
 	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5;
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPU;

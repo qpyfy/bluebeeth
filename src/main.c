@@ -53,25 +53,14 @@ int main()
         // 
         //MPU6050测试
         // MPU6050_GetData(&x, &y, &z, &yaw, &pitch, &roll);
-        OLED_ShowSignedNum(1, 1, yaw, 3);
-        OLED_ShowNum(2, 1, pitch, 3);
-        OLED_ShowNum(3, 1, roll, 3);
 
-        // OLED_ShowString(1, 1, "Y:");
-        // OLED_ShowNum(1, 3, yaw, 3);
-        // OLED_ShowString(1, 7, "P:");
-        // OLED_ShowNum(1, 9, pitch, 3);
-        // OLED_ShowString(1, 13, "R:");
-        // OLED_ShowNum(1, 15, roll, 3);
-        // OLED_ShowString(2, 1, "X:");
-        // OLED_ShowNum(2, 3, x, 3);
-        // OLED_ShowString(2, 7, "Y:");
-        // OLED_ShowNum(2, 9, y, 3);
-        // OLED_ShowString(2, 13, "Z:");
-        // OLED_ShowNum(2, 15, z, 3);
-        // OLED_ShowString(3, 1, "T:");
-        // OLED_ShowNum(3, 3, temp, 3);
+        // OLED_ShowSignedNum(1, 1, yaw, 3);
+        // OLED_ShowSignedNum(2, 1, pitch, 3);
+        // OLED_ShowSignedNum(3, 1, roll, 3);
 
+        OLED_ShowSignedNum(1,1,ax,3);
+        OLED_ShowSignedNum(2,1,ay,3);
+        OLED_ShowSignedNum(3,1,az,3);
 
 
     }
