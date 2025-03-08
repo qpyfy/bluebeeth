@@ -16,8 +16,40 @@ void MPU6050_WriteReg(uint8_t RegAddress, uint8_t Data)
 	I2C_SendByte(Data);				//发送要写入寄存器的数据
 	I2C_ReceiveAck();					//接收应答
 	I2C_Stop();						//I2C终止
+	return 0;
 }
 
+u8 MPU_Write_Len(u8 addr,u8 reg,u8 len,u8 *buf){
+	I2C_Start();						//I2C起始
+	I2C_SendByte(addr);	//发送从机地址，读写位为0，表示即将写入
+	I2C_ReceiveAck();					//接收应答
+	I2C_SendByte(reg);			//发送寄存器地址
+	I2C_ReceiveAck();					//接收应答
+	for(u8 i = 0;i < len;i++){
+		I2C_SendByte(buf[i]);
+		if(I2C_ReceiveAck())
+		{
+			I2C_Stop();
+			return 1;
+		}
+	}
+	I2C_Stop();						//I2C终止
+	return 0;
+}
+
+u8 MPU_Read_Len(u8 addr,u8 reg,u8 len,u8 *buf){
+	I2C_Start();
+	I2C_SendByte(addr);
+	I2C_ReceiveAck();
+	I2C_SendByte(reg);
+	I2C_ReceiveAck();
+	for(u8 i = 0;i < len;i++){
+		buf[i] = I2C_ReceiveByte();
+		I2C_SendAck(i == len - 1 ? 0 : 1);
+	}
+	I2C_Stop();
+	return 0;
+}
 
 uint8_t MPU6050_ReadReg(uint8_t RegAddress)
 {

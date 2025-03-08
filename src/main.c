@@ -9,9 +9,7 @@ extern u8 rxbuff;
 extern u8 rxflag;
 extern u8 rxlen;
 //MPU6050数据
-int16_t yaw, pitch, roll;
-int16_t x, y, z;
-int16_t temp;
+
 //72MHZ 1ms i=72000
 
 int main()

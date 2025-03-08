@@ -9,4 +9,7 @@ uint8_t MPU6050_GetID(void);
 void MPU6050_GetData(int16_t *AccX, int16_t *AccY, int16_t *AccZ, 
 						int16_t *GyroX, int16_t *GyroY, int16_t *GyroZ);
 uint8_t MPU6050_Test(void);
+
+u8 MPU_Write_Len(u8 addr,u8 reg,u8 len,u8 *buf);
+u8 MPU_Read_Len(u8 addr,u8 reg,u8 len,u8 *buf);
 #endif
