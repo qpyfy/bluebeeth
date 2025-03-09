@@ -23,19 +23,12 @@ void Motor_Init(void){
 
 }
 
-#define MOTOR_SPEED 100
+#define MOTOR_SPEED 5000
 
-void Limit_Speed(uint8_t *motor1, uint8_t *motor2){
-    if(*motor1 > MOTOR_SPEED){
-        *motor1 = MOTOR_SPEED;
-    }
-    if(*motor2 > MOTOR_SPEED){
-        *motor2 = MOTOR_SPEED;
-    }
-    *motor2 = -*motor2; //取反让电机同向
-}
 
 uint32_t abs(int32_t num){
+    if(num > MOTOR_SPEED)num = MOTOR_SPEED;
+    else if(num < -MOTOR_SPEED) num = -MOTOR_SPEED;
     return num > 0 ? num : -num;
 }
 /*
@@ -44,8 +37,7 @@ uint32_t abs(int32_t num){
 @note 电机速度范围-100~100
 @note 电机速度为正数时电机正转，为负数时电机反转
 */
-void Motor_Load(uint8_t motor1, uint8_t motor2){
-    Limit_Speed(&motor1, &motor2);
+void Motor_Load(uint16_t motor1, uint16_t motor2){
     if(motor1 > 0){
         GPIO_SetBits(GPIOB, MOTOR_AIN1);
         GPIO_ResetBits(GPIOB, MOTOR_AIN2);
@@ -57,7 +49,7 @@ void Motor_Load(uint8_t motor1, uint8_t motor2){
         PWMA_SetDutyCycle(abs(motor1));
     }
 
-    if (motor2 > 0){
+    if (motor2 < 0){
         GPIO_SetBits(GPIOB, MOTOR_BIN1);
         GPIO_ResetBits(GPIOB, MOTOR_BIN2);
         PWMB_SetDutyCycle(abs(motor2));

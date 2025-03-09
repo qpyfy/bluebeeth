@@ -48,14 +48,14 @@ void PWM_Init(void){
 @param dutyCycle 占空比 0~100
 */
 void PWMA_SetDutyCycle(uint8_t dutyCycle){
-    uint8_t tim_pulse = 1000 * dutyCycle / 100;
-    TIM_SetCompare1(TIM1, tim_pulse);
+    //uint8_t tim_pulse = 1000 * dutyCycle / 100;
+    TIM_SetCompare1(TIM1, dutyCycle);
 }
 /*
 @param dutyCycle 占空比 0~100
 */
 void PWMB_SetDutyCycle(uint8_t dutyCycle){
-    uint8_t tim_pulse = 1000 * dutyCycle / 100;
-    TIM_SetCompare4(TIM1, tim_pulse);
+    //uint8_t tim_pulse = 1000 * dutyCycle / 100;
+    TIM_SetCompare4(TIM1, dutyCycle);
 }
 

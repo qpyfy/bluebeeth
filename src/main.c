@@ -1,6 +1,8 @@
 #include "motor.h"
 #include "bluetooth.h"
 #include "mpu6050.h"
+#include "mpu6050_exit.h"
+#include "mpu6050_reg.h"
 #include "oled.h"
 #include "delay.h"
 #include "eMPL/inv_mpu.h"
@@ -23,10 +25,17 @@ void FloatToString(float f, char *s)
 int main()
 {  
     OLED_Init();
+    OLED_ShowString(1, 1, "OLED Test");
     Bluetooth_Init();
+    OLED_ShowString(1, 1, "Bluetooth Test");
     Motor_Init();
+    OLED_ShowString(1, 1, "Motor Test");
     MPU6050_Init();
+    OLED_ShowString(1, 1, "MPU6050 Test");
     mpu_dmp_init();
+    OLED_ShowString(1, 1, "DMP Test");
+    MPU6050_Exit_Init();
+    OLED_ShowString(1, 1, "Exit Test");
     delay_ms(10);
     OLED_Clear();
     while (1)
@@ -51,16 +60,26 @@ int main()
         // OLED_ShowString(1, 1, "Motor Stop");
         // delay_ms(50);OLED_Clear();
         // 
-        //MPU6050测试
-        // MPU6050_GetData(&x, &y, &z, &yaw, &pitch, &roll);
+        // //MPU6050测试
+        // MPU6050_GetData(&ax, &ay, &az, &gx, &gy, &gz);
+        // OLED_ShowSignedNum(1,1,ax,4);
+        // OLED_ShowSignedNum(2,1,ay,4);
+        // OLED_ShowSignedNum(3,1,az,4);
 
-        // OLED_ShowSignedNum(1, 1, yaw, 3);
-        // OLED_ShowSignedNum(2, 1, pitch, 3);
-        // OLED_ShowSignedNum(3, 1, roll, 3);
+        // MPU_Get_Gyroscope(&gx, &gy, &gz);
+        // OLED_ShowSignedNum(1, 1, gx, 4);
+        // OLED_ShowSignedNum(2, 1, gy, 4);
+        // OLED_ShowSignedNum(3, 1, gz, 4);
 
-        OLED_ShowSignedNum(1,1,ax,3);
-        OLED_ShowSignedNum(2,1,ay,3);
-        OLED_ShowSignedNum(3,1,az,3);
+        // mpu_dmp_get_data(&pitch, &roll, &yaw);
+        // OLED_ShowSignedNum(1, 1, pitch, 3);
+        // OLED_ShowSignedNum(2, 1, roll, 3);
+        // OLED_ShowSignedNum(3, 1, yaw, 3);
+
+   
+        // u8 id = MPU6050_ReadReg(MPU_DEVICE_ID_REG);
+        // u8 stat = GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_5);
+        // OLED_ShowNum(1, 1, res, 4);
 
 
     }

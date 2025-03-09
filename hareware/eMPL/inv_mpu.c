@@ -27,6 +27,7 @@
 #include "mpu6050.h"
 #include "delay.h"
 #include "i2c.h"
+#include "oled.h"
 
 
 #define MPU6050							//定义我们使用的传感器为MPU6050
@@ -2955,6 +2956,7 @@ void mget_ms(unsigned long *time)
 u8 mpu_dmp_init(void)
 {
 	u8 res=0;
+    I2C_GPIO_Init();
 	if(mpu_init()==0)	//初始化MPU6050
 	{	 
 		res=mpu_set_sensors(INV_XYZ_GYRO|INV_XYZ_ACCEL);//设置所需要的传感器
@@ -2962,7 +2964,7 @@ u8 mpu_dmp_init(void)
 		res=mpu_configure_fifo(INV_XYZ_GYRO|INV_XYZ_ACCEL);//设置FIFO
 		if(res)return 2; 
 		res=mpu_set_sample_rate(DEFAULT_MPU_HZ);	//设置采样率
-		if(res)return 3; 
+		if(res)return 3;
 		res=dmp_load_motion_driver_firmware();		//加载dmp固件
 		if(res)return 4; 
 		res=dmp_set_orientation(inv_orientation_matrix_to_scalar(gyro_orientation));//设置陀螺仪方向
@@ -2977,6 +2979,7 @@ u8 mpu_dmp_init(void)
 	//	if(res)return 8;    
 		res=mpu_set_dmp_state(1);	//使能DMP
 		if(res)return 9;     
+        OLED_ShowNum(1,8,8,1);
 	}else return 10;
 	return 0;
 }

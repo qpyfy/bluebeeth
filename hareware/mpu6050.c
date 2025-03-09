@@ -20,7 +20,7 @@ void MPU6050_WriteReg(uint8_t RegAddress, uint8_t Data)
 
 u8 MPU_Write_Len(u8 addr,u8 reg,u8 len,u8 *buf){
 	I2C_Start();						//I2C起始
-	I2C_SendByte(addr);	//发送从机地址，读写位为0，表示即将写入
+	I2C_SendByte(addr<<1|0);	//发送从机地址，读写位为0，表示即将写入
 	I2C_ReceiveAck();					//接收应答
 	I2C_SendByte(reg);			//发送寄存器地址
 	I2C_ReceiveAck();					//接收应答
@@ -33,20 +33,6 @@ u8 MPU_Write_Len(u8 addr,u8 reg,u8 len,u8 *buf){
 		}
 	}
 	I2C_Stop();						//I2C终止
-	return 0;
-}
-
-u8 MPU_Read_Len(u8 addr,u8 reg,u8 len,u8 *buf){
-	I2C_Start();
-	I2C_SendByte(addr);
-	I2C_ReceiveAck();
-	I2C_SendByte(reg);
-	I2C_ReceiveAck();
-	for(u8 i = 0;i < len;i++){
-		buf[i] = I2C_ReceiveByte();
-		I2C_SendAck(i == len - 1 ? 0 : 1);
-	}
-	I2C_Stop();
 	return 0;
 }
 uint8_t MPU6050_ReadReg(uint8_t RegAddress)
@@ -74,6 +60,42 @@ uint8_t MPU6050_ReadReg(uint8_t RegAddress)
 	
 	return Data;
 }
+u8 MPU_Read_Len(u8 addr,u8 reg,u8 len,u8 *buf){
+	I2C_Start();
+	I2C_SendByte(addr<< 1| 0);
+	if(I2C_ReceiveAck()){
+		OLED_ShowString(1,2,"MPU6050 ERROR1");
+	}
+	I2C_SendByte(reg);
+	if(I2C_ReceiveAck()){
+		OLED_ShowString(1,2,"MPU6050 ERROR2");
+	}
+	I2C_Start();
+	I2C_SendByte(addr<< 1| 1);
+	if(I2C_ReceiveAck()){
+		OLED_ShowString(1,2,"MPU6050 ERROR3");
+	}
+
+	while(len){
+		if(len==1)
+		{
+			*buf = I2C_ReceiveByte();
+			I2C_SendAck(1);
+		}
+		else 
+		{
+			*buf = I2C_ReceiveByte();
+			I2C_SendAck(0);
+		}
+		len--;
+		buf++; 
+	}
+
+
+	I2C_Stop();
+	return 0;
+}
+
 
 
 void MPU_Set_Gyro_Fsr(u8 fsr)
@@ -99,7 +121,7 @@ void MPU6050_Init(void)
 	MPU6050_WriteReg(MPU_PWR_MGMT1_REG,0X00);	//唤醒MPU6050 
 	MPU_Set_Gyro_Fsr(3);					//陀螺仪传感器,±2000dps
 	MPU_Set_Accel_Fsr(0);					//加速度传感器,±2g
-	MPU_Set_Rate(200);						//设置采样率50Hz
+	MPU_Set_Rate(100);						//设置采样率50Hz
 	MPU6050_WriteReg(MPU_INT_EN_REG,0X00);	//关闭所有中断
 	MPU6050_WriteReg(MPU_USER_CTRL_REG,0X00);	//I2C主模式关闭
 	MPU6050_WriteReg(MPU_FIFO_EN_REG,0X00);	//关闭FIFO
@@ -109,34 +131,8 @@ void MPU6050_Init(void)
 	{
 		MPU6050_WriteReg(MPU_PWR_MGMT1_REG,0X01);	//设置CLKSEL,PLL X轴为参考
 		MPU6050_WriteReg(MPU_PWR_MGMT2_REG,0X00);	//加速度与陀螺仪都工作
-		MPU_Set_Rate(100);						//设置采样率为50Hz
+		MPU_Set_Rate(200);						//设置采样率为50Hz
  	}
-    //配置中断引脚
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
-	GPIO_InitTypeDef GPIO_InitStruct;
-	GPIO_InitStruct.GPIO_Pin = GPIO_Pin_5;
-	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPU;
-	GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource5);
-
-	EXTI_InitTypeDef EXTI_InitStruct;
-	EXTI_InitStruct.EXTI_Line = EXTI_Line5;
-	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Falling;
-	EXTI_InitStruct.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStruct);
-
-	NVIC_EnableIRQ(EXTI9_5_IRQn);
-
-	NVIC_InitTypeDef NVIC_InitStruct;
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
-	NVIC_InitStruct.NVIC_IRQChannel = EXTI9_5_IRQn;
-	NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 2;
-	NVIC_InitStruct.NVIC_IRQChannelSubPriority = 2;
-	NVIC_Init(&NVIC_InitStruct);
 }
 
 uint8_t MPU6050_GetID(void)
@@ -149,8 +145,21 @@ uint8_t MPU6050_Test(void){
 }
 
 
-void MPU6050_GetData(int16_t *AccX, int16_t *AccY, int16_t *AccZ, 
-						int16_t *GyroX, int16_t *GyroY, int16_t *GyroZ)
+u8 MPU_Get_Gyroscope(short *gx,short *gy,short *gz)
+{
+    u8 buf[6],res;  
+	res=MPU_Read_Len(MPU_ADDR << 1,MPU_GYRO_XOUTH_REG,6,buf);
+	if(res==0)
+	{
+		*gx=((u16)buf[0]<<8)|buf[1];  
+		*gy=((u16)buf[2]<<8)|buf[3];  
+		*gz=((u16)buf[4]<<8)|buf[5];
+	} 	
+    return res;;
+}
+
+void MPU6050_GetData(int *AccX, int *AccY, int *AccZ, 
+						int *GyroX, int *GyroY, int *GyroZ)
 {
 	uint8_t DataH, DataL;								//定义数据高8位和低8位的变量
 	
