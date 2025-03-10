@@ -5,5 +5,5 @@
 
 void Encoder_Init(void);
 
-u8 Encoder_GetValue(uint8_t encoder);
+int Encoder_GetValue(int encoder);
 #endif // !EN

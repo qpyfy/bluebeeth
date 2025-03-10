@@ -39,6 +39,8 @@ int main()
     Encoder_Init();
     OLED_Clear();    
     MPU6050_Exit_Init();
+
+    Motor_Load(100, 100);
     while (1)
     {
         //蓝牙测试
@@ -81,7 +83,11 @@ int main()
         // u8 id = MPU6050_ReadReg(MPU_DEVICE_ID_REG);
         // u8 stat = GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_5);
         // OLED_ShowNum(1, 1, res, 4);
-
+        //编码器测试
+        // int left = -Encoder_GetValue(1);
+        // int right = Encoder_GetValue(2);
+        // OLED_ShowSignedNum(1, 1, left, 5);
+        // OLED_ShowSignedNum(2, 1, right, 5);
 
     }
     

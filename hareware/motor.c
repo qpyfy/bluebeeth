@@ -38,7 +38,7 @@ int abs(int num){
 @note 电机速度为正数时电机正转，为负数时电机反转
 */
 void Motor_Load(int motor1, int motor2){
-    if(motor1 > 0){
+    if(motor1 < 0){
         GPIO_SetBits(GPIOB, MOTOR_AIN1);
         GPIO_ResetBits(GPIOB, MOTOR_AIN2);
         PWMA_SetDutyCycle(abs(motor1));
@@ -49,7 +49,7 @@ void Motor_Load(int motor1, int motor2){
         PWMA_SetDutyCycle(abs(motor1));
     }
 
-    if (motor2 < 0){
+    if (motor2 > 0){
         GPIO_SetBits(GPIOB, MOTOR_BIN1);
         GPIO_ResetBits(GPIOB, MOTOR_BIN2);
         PWMB_SetDutyCycle(abs(motor2));

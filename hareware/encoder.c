@@ -3,7 +3,9 @@
 void Encoder_Init(void)
 {
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);    
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
     GPIO_InitTypeDef GPIO_InitStructure;
 
     GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_0 | GPIO_Pin_1;
@@ -13,8 +15,7 @@ void Encoder_Init(void)
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+
     TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
     TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
     TIM_TimeBaseStructure.TIM_Period        = 0xffff;
@@ -47,14 +48,14 @@ void Encoder_Init(void)
     TIM_Cmd(TIM4, ENABLE);
 }
 
-u8 Encoder_GetValue(uint8_t encoder)
+int Encoder_GetValue(int encoder)
 {
     if (encoder == 1) {
-        u8 cnt = TIM_GetCounter(TIM2);
+        int cnt = (short)TIM_GetCounter(TIM2);
         TIM_SetCounter(TIM2, 0);
         return cnt;
     } else if (encoder == 2) {
-        u8 cnt = TIM_GetCounter(TIM4);
+        int cnt = (short)TIM_GetCounter(TIM4);
         TIM_SetCounter(TIM4, 0);
         return cnt;
     }

@@ -90,7 +90,7 @@ int VelocityControl(int target){
 	if(err_sum > 10000) err_sum = 10000;
 	else if (err_sum < -10000) err_sum = -10000; // 限幅
 
-	if(direction == STOP)err_sum = 0;
+	//if(direction == STOP)err_sum = 0;
 
 	err_last = err_out; // 保存误差
 
