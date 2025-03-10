@@ -10,6 +10,7 @@
 
 #define LPF_COEFFICIENT 0.7 //低通滤波器的比例系数
 #define MED_ANGLE -0.04
+
 #define VELOCITY_KP 250
 #define VELOCITY_KI 0.6
 
@@ -34,11 +35,11 @@ void EXTI9_5_IRQHandler(void){
 		EXTI_ClearITPendingBit(EXTI_Line5);
 		MPU6050_GetData(&ax,&ay, &az, &gx, &gy, &gz); 
 		mpu_dmp_get_data(&roll, &pitch, &yaw);
-        //控制电机
 
-		OLED_ShowSignedNum(1, 1, pitch,3);
-		OLED_ShowSignedNum(2, 1, roll,3);
-		OLED_ShowSignedNum(3, 1, yaw,3);
+		OLED_ShowSignedNum(1, 1, (int)pitch, 3);
+		OLED_ShowChar(1, 4, '.');
+		OLED_ShowNum(1, 5, ((int)(pitch*100) % 100), 2);
+        //控制电机
 		if(direction == STOP){
 			speed = 0;
 			turn = 0;
@@ -66,6 +67,10 @@ void EXTI9_5_IRQHandler(void){
 		int pwm_out = BalanceControl(velocity+MED_ANGLE);
 		int turn_out = TurnControl(turn);
 
+
+		OLED_ShowSignedNum(2, 1, (int)velocity, 5);
+		OLED_ShowSignedNum(3, 1, (int)turn, 5);
+
 		Motor_Load(pwm_out + turn_out, pwm_out - turn_out);
 	}
  
@@ -76,12 +81,17 @@ int VelocityControl(int target){
 	static int err_last = 0, err_speed = 0, err_out = 0, err_sum = 0;
 
 	//低通滤波
-	left_speed = Encoder_GetValue(1);right_speed = -Encoder_GetValue(2);
+	left_speed = -Encoder_GetValue(1);right_speed = Encoder_GetValue(2);
+	OLED_ShowSignedNum(4, 1, (int)left_speed, 4);
+	OLED_ShowSignedNum(4, 7, (int)right_speed, 4);
 	err_speed  = (left_speed + right_speed) - target; // 速度误差
 	err_out = (1 - LPF_COEFFICIENT) * err_speed + LPF_COEFFICIENT * err_last; // 低通滤波
 	err_sum += err_out; // 误差积分
 	if(err_sum > 10000) err_sum = 10000;
 	else if (err_sum < -10000) err_sum = -10000; // 限幅
+
+	if(direction == STOP)err_sum = 0;
+
 	err_last = err_out; // 保存误差
 
 	//PI

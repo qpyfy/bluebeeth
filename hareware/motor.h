@@ -5,6 +5,6 @@
 #include "pwm.h"
 
 void Motor_Init(void);
-void Motor_Load(uint16_t motor1, uint16_t motor2);
+void Motor_Load(int motor1, int motor2);
 
 #endif // !MOTOR_H

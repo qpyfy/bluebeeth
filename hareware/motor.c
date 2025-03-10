@@ -26,7 +26,7 @@ void Motor_Init(void){
 #define MOTOR_SPEED 5000
 
 
-uint32_t abs(int32_t num){
+int abs(int num){
     if(num > MOTOR_SPEED)num = MOTOR_SPEED;
     else if(num < -MOTOR_SPEED) num = -MOTOR_SPEED;
     return num > 0 ? num : -num;
@@ -37,7 +37,7 @@ uint32_t abs(int32_t num){
 @note 电机速度范围-100~100
 @note 电机速度为正数时电机正转，为负数时电机反转
 */
-void Motor_Load(uint16_t motor1, uint16_t motor2){
+void Motor_Load(int motor1, int motor2){
     if(motor1 > 0){
         GPIO_SetBits(GPIOB, MOTOR_AIN1);
         GPIO_ResetBits(GPIOB, MOTOR_AIN2);

@@ -1,6 +1,7 @@
 #include "motor.h"
 #include "bluetooth.h"
 #include "mpu6050.h"
+#include "encoder.h"
 #include "mpu6050_exit.h"
 #include "mpu6050_reg.h"
 #include "oled.h"
@@ -34,10 +35,10 @@ int main()
     OLED_ShowString(1, 1, "MPU6050 Test");
     mpu_dmp_init();
     OLED_ShowString(1, 1, "DMP Test");
-    MPU6050_Exit_Init();
-    OLED_ShowString(1, 1, "Exit Test");
     delay_ms(10);
-    OLED_Clear();
+    Encoder_Init();
+    OLED_Clear();    
+    MPU6050_Exit_Init();
     while (1)
     {
         //蓝牙测试
